@@ -9,7 +9,16 @@ $ npm install
 $ npm start
 ```
 
-fork from https://github.com/ant-design/ant-design-pro/tree/v2 （原项目采用的 [umi](https://umijs.org/) + [dva](https://dvajs.com/)）
+## 说明
+
+项目 fork from https://github.com/ant-design/ant-design-pro/tree/v2 （原项目采用的 [umi](https://umijs.org/) + [dva](https://dvajs.com/)）
+
+修改原分支包括：
+
+- 去掉 redux 相关用法
+- 使用 umi/link, umi/router
+- 去掉 dva
+- 修改 /list/search/applications bug
 
 ## 功能
 
