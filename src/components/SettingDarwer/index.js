@@ -1,10 +1,11 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Select, message, Drawer, List, Switch, Divider, Icon, Button } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import styles from './index.less';
 import ThemeColor from './ThemeColor';
 import BlockChecbox from './BlockChecbox';
+import { setting } from '@/states/setting';
 
 const Body = ({ children, title, style }) => (
   <div
@@ -18,12 +19,10 @@ const Body = ({ children, title, style }) => (
   </div>
 );
 
-@connect(({ setting }) => ({ setting }))
-class SettingDarwer extends PureComponent {
+@connect(setting)
+class SettingDarwer extends Component {
   getLayOutSetting = () => {
-    const {
-      setting: { grid, fixedHeader, layout, autoHideHeader, fixSiderbar },
-    } = this.props;
+    const { grid, fixedHeader, layout, autoHideHeader, fixSiderbar } = setting.state;
     return [
       {
         title: '栅格模式',
@@ -77,8 +76,7 @@ class SettingDarwer extends PureComponent {
   };
 
   changeSetting = (key, value) => {
-    const { setting } = this.props;
-    const nextState = { ...setting };
+    const nextState = { ...setting.state };
     nextState[key] = value;
     if (key === 'layout') {
       if (value === 'topmenu') {
@@ -93,22 +91,17 @@ class SettingDarwer extends PureComponent {
       }
     }
     this.setState(nextState, () => {
-      const { dispatch } = this.props;
-      dispatch({
-        type: 'setting/changeSetting',
-        payload: this.state,
-      });
+      setting.changeSetting(this.state);
     });
   };
 
   togglerContent = () => {
-    const { setting } = this.props;
-    this.changeSetting('collapse', !setting.collapse);
+    this.changeSetting('collapse', !setting.state.collapse);
   };
 
   render() {
-    const { setting } = this.props;
-    const { collapse, silderTheme, themeColor, layout, colorWeak } = setting;
+    const { collapse, silderTheme, themeColor, layout, colorWeak } = setting.state;
+    debugger
     return (
       <Drawer
         firstEnter={true}

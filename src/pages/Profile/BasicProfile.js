@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import { Card, Badge, Table, Divider } from 'antd';
 import DescriptionList from 'components/DescriptionList';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+import { profile } from './states/profile';
 import styles from './BasicProfile.less';
 
 const { Description } = DescriptionList;
@@ -41,21 +42,14 @@ const progressColumns = [
   },
 ];
 
-@connect(({ profile, loading }) => ({
-  profile,
-  loading: loading.effects['profile/fetchBasic'],
-}))
+@connect(profile)
 export default class BasicProfile extends Component {
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'profile/fetchBasic',
-    });
+    profile.fetchBasic();
   }
 
   render() {
-    const { profile, loading } = this.props;
-    const { basicGoods, basicProgress } = profile;
+    const { basicGoods, basicProgress, fetchBasicLoading : loading } = profile.state;
     let goodsData = [];
     if (basicGoods.length) {
       let num = 0;

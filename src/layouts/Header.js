@@ -1,16 +1,28 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Layout, message } from 'antd';
 import Animate from 'rc-animate';
-import { connect } from 'dva';
-import { routerRedux } from 'dva/router';
+import { connect } from 'bbx';
+import router from 'umi/router';
 import GlobalHeader from '../components/GlobalHeader';
 import TopNavHeader from '../components/TopNavHeader';
+import { user } from '@/states/user';
+import { global } from '@/states/global';
+import { setting } from '@/states/setting';
+import { login } from '@/pages/User/states/login';
 import styles from './Header.less';
 import Authorized from '../utils/Authorized';
 
 const { Header } = Layout;
 
-class HeaderView extends PureComponent {
+// connect(({ user, global, setting, loading }) => ({
+//   currentUser: user.currentUser,
+//   collapsed: global.collapsed,
+//   fetchingNotices: loading.effects['global/fetchNotices'],
+//   notices: global.notices,
+//   setting,
+// }))(HeaderView)
+@connect(user, global, setting)
+class HeaderView extends Component {
   state = {
     visible: true,
   };
@@ -24,8 +36,10 @@ class HeaderView extends PureComponent {
   }
 
   getHeadWidth = () => {
-    const { isMobile, collapsed, setting } = this.props;
+    const { isMobile } = this.props;
+    const { collapsed } = global.state;
     const { fixedHeader, layout } = setting;
+
     if (isMobile || !fixedHeader || layout === 'topmenu') {
       return '100%';
     }
@@ -34,45 +48,35 @@ class HeaderView extends PureComponent {
 
   handleNoticeClear = type => {
     message.success(`清空了${type}`);
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'global/clearNotices',
-      payload: type,
-    });
+    global.clearNotices(type);
   };
 
   handleMenuClick = ({ key }) => {
-    const { dispatch } = this.props;
     if (key === 'userCenter') {
-      dispatch(routerRedux.push('/account/center'));
+      router.push('/account/center');
       return;
     }
     if (key === 'triggerError') {
-      dispatch(routerRedux.push('/exception/trigger'));
+      router.push('/exception/trigger');
       return;
     }
     if (key === 'userinfo') {
-      dispatch(routerRedux.push('/account/settings/base'));
+      router.push('/account/settings/base');
       return;
     }
     if (key === 'logout') {
-      dispatch({
-        type: 'login/logout',
-      });
+      login.logout();
     }
   };
 
   handleNoticeVisibleChange = visible => {
     if (visible) {
-      const { dispatch } = this.props;
-      dispatch({
-        type: 'global/fetchNotices',
-      });
+      global.fetchNotices();
     }
   };
 
   handScroll = e => {
-    const { autoHideHeader } = this.props;
+    const { autoHideHeader } = setting.state;
     const { visible } = this.state;
     if (!autoHideHeader) {
       return;
@@ -106,7 +110,7 @@ class HeaderView extends PureComponent {
   };
 
   render() {
-    const { isMobile, handleMenuCollapse, setting } = this.props;
+    const { isMobile, handleMenuCollapse } = this.props;
     const { silderTheme, layout, fixedHeader } = setting;
     const { visible } = this.state;
     const isTop = layout === 'topmenu';
@@ -124,6 +128,8 @@ class HeaderView extends PureComponent {
             onNoticeClear={this.handleNoticeClear}
             onMenuClick={this.handleMenuClick}
             onNoticeVisibleChange={this.handleNoticeVisibleChange}
+            currentUser={user.state.currentUser}
+            notices={global.state.notices}
             {...this.props}
           />
         ) : (
@@ -132,6 +138,8 @@ class HeaderView extends PureComponent {
             onNoticeClear={this.handleNoticeClear}
             onMenuClick={this.handleMenuClick}
             onNoticeVisibleChange={this.handleNoticeVisibleChange}
+            currentUser={user.state.currentUser}
+            notices={global.state.notices}
             {...this.props}
           />
         )}
@@ -145,10 +153,4 @@ class HeaderView extends PureComponent {
   }
 }
 
-export default connect(({ user, global, setting, loading }) => ({
-  currentUser: user.currentUser,
-  collapsed: global.collapsed,
-  fetchingNotices: loading.effects['global/fetchNotices'],
-  notices: global.notices,
-  setting,
-}))(HeaderView);
+export default HeaderView;

@@ -1,6 +1,7 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Select, Spin } from 'antd';
-import { connect } from 'dva';
+import { connect } from 'bbx';
+import { geographic } from './states/geographic';
 import styles from './GeographicView.less';
 
 const { Option } = Select;
@@ -10,40 +11,27 @@ const nullSlectItem = {
   key: '',
 };
 
-@connect(({ geographic }) => {
-  const { province, isLoading, city } = geographic;
-  return {
-    province,
-    city,
-    isLoading,
-  };
-})
-export default class GeographicView extends PureComponent {
+@connect(geographic)
+export default class GeographicView extends Component {
   componentDidMount = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'geographic/fetchProvince',
-    });
+    geographic.fetchProvince();
   };
 
   componentDidUpdate(props) {
-    const { dispatch, value } = this.props;
+    const { value } = this.props;
 
     if (!props.value && !!value && !!value.province) {
-      dispatch({
-        type: 'geographic/fetchCity',
-        payload: value.province.key,
-      });
+      geographic.fetchCity(value.province.key);
     }
   }
 
   getProvinceOption() {
-    const { province } = this.props;
+    const { province } = geographic.state;
     return this.getOption(province);
   }
 
   getCityOption = () => {
-    const { city } = this.props;
+    const { city } = geographic.state;
     return this.getOption(city);
   };
 
@@ -65,11 +53,8 @@ export default class GeographicView extends PureComponent {
   };
 
   selectProvinceItem = item => {
-    const { dispatch, onChange } = this.props;
-    dispatch({
-      type: 'geographic/fetchCity',
-      payload: item.key,
-    });
+    const { onChange } = this.props;
+    geographic.fetchCity(item.key);
     onChange({
       province: item,
       city: nullSlectItem,
@@ -101,9 +86,10 @@ export default class GeographicView extends PureComponent {
 
   render() {
     const { province, city } = this.conversionObject();
-    const { isLoading } = this.props;
+    const { fetchProvinceLoading, fetchCityLoading } = geographic.state;
+    const loading = fetchProvinceLoading || fetchCityLoading;
     return (
-      <Spin spinning={isLoading} wrapperClassName={styles.row}>
+      <Spin spinning={loading} wrapperClassName={styles.row}>
         <Select
           className={styles.item}
           value={province}

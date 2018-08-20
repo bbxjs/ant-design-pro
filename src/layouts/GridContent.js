@@ -1,10 +1,14 @@
-import React, { PureComponent } from 'react';
-import { connect } from 'dva';
+import React, { Component } from 'react';
+import { connect } from 'bbx';
+import { setting } from '@/states/setting';
 import styles from './GridContent.less';
 
-class GridContent extends PureComponent {
+@connect(setting)
+class GridContent extends Component {
   render() {
-    const { grid, children } = this.props;
+    const { children } = this.props;
+    const { grid } = setting.state;
+
     let className = `${styles.main}`;
     if (grid === 'Wide') {
       className = `${styles.main} ${styles.wide}`;
@@ -13,6 +17,4 @@ class GridContent extends PureComponent {
   }
 }
 
-export default connect(({ setting }) => ({
-  grid: setting.grid,
-}))(GridContent);
+export default GridContent;

@@ -1,13 +1,13 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import moment from 'moment';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import { Row, Col, Form, Card, Select, List } from 'antd';
 
 import TagSelect from 'components/TagSelect';
 import AvatarList from 'components/AvatarList';
 import Ellipsis from 'components/Ellipsis';
 import StandardFormRow from 'components/StandardFormRow';
-
+import { list } from '@/states/list';
 import styles from './Projects.less';
 
 const { Option } = Select;
@@ -15,53 +15,40 @@ const FormItem = Form.Item;
 
 /* eslint react/no-array-index-key: 0 */
 @Form.create()
-@connect(({ list, loading }) => ({
-  list,
-  loading: loading.models.list,
-}))
-export default class CoverCardList extends PureComponent {
+@connect(list)
+export default class CoverCardList extends Component {
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'list/fetch',
-      payload: {
-        count: 8,
-      },
+    list.fetch({
+      count: 8,
     });
   }
 
   handleFormSubmit = () => {
-    const { form, dispatch } = this.props;
+    const { form } = this.props;
     // setTimeout 用于保证获取表单值是在所有表单字段更新完毕的时候
     setTimeout(() => {
       form.validateFields(err => {
         if (!err) {
           // eslint-disable-next-line
-          dispatch({
-            type: 'list/fetch',
-            payload: {
-              count: 8,
-            },
-          });
+          list.fetch({
+            count: 8,
+          })
         }
       });
     }, 0);
   };
 
   render() {
-    const {
-      list: { list = [] },
-      loading,
-      form,
-    } = this.props;
+    const { form } = this.props;
     const { getFieldDecorator } = form;
+    const { list: dataSource, fetchLoading: loading } = list.state;
 
-    const cardList = list ? (
+    const cardList = dataSource ? (
       <List
         rowKey="id"
         loading={loading}
         grid={{ gutter: 24, xl: 4, lg: 3, md: 3, sm: 2, xs: 1 }}
-        dataSource={list}
+        dataSource={dataSource}
         renderItem={item => (
           <List.Item>
             <Card

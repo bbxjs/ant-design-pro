@@ -1,18 +1,14 @@
 import React, { PureComponent } from 'react';
 import { List, Icon, Avatar, Tag } from 'antd';
 import moment from 'moment';
-import { connect } from 'dva';
+import { connect } from 'bbx';
+import { list } from '@/states/list';
 import stylesArticles from '../../List/Articles.less';
 import styles from './Articles.less';
 
-@connect(({ list }) => ({
-  list,
-}))
+@connect(list)
 export default class Center extends PureComponent {
   render() {
-    const {
-      list: { list },
-    } = this.props;
     const IconText = ({ type, text }) => (
       <span>
         <Icon type={type} style={{ marginRight: 8 }} />
@@ -29,13 +25,14 @@ export default class Center extends PureComponent {
         </div>
       </div>
     );
+    const { list: dataSource } = list.state;
     return (
       <List
         size="large"
         className={styles.articleList}
         rowKey="id"
         itemLayout="vertical"
-        dataSource={list}
+        dataSource={dataSource}
         renderItem={item => (
           <List.Item
             key={item.id}

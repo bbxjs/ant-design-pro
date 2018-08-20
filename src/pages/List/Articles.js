@@ -1,10 +1,11 @@
 import React, { Component, Fragment } from 'react';
 import moment from 'moment';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import { Form, Card, Select, List, Tag, Icon, Avatar, Row, Col, Button } from 'antd';
 
 import TagSelect from 'components/TagSelect';
 import StandardFormRow from 'components/StandardFormRow';
+import { list } from '@/states/list';
 import styles from './Articles.less';
 
 const { Option } = Select;
@@ -13,10 +14,7 @@ const FormItem = Form.Item;
 const pageSize = 5;
 
 @Form.create()
-@connect(({ list, loading }) => ({
-  list,
-  loading: loading.models.list,
-}))
+@connect(list)
 export default class SearchList extends Component {
   componentDidMount() {
     this.fetchMore();
@@ -30,22 +28,15 @@ export default class SearchList extends Component {
   };
 
   fetchMore = () => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'list/appendFetch',
-      payload: {
-        count: pageSize,
-      },
+    list.appendFetch({
+      count: pageSize,
     });
   };
 
   render() {
-    const {
-      form,
-      list: { list },
-      loading,
-    } = this.props;
+    const { form } = this.props;
     const { getFieldDecorator } = form;
+    const { list: dataSource, appenFetchLoading: loading } = list.state;
 
     const owners = [
       {
@@ -98,7 +89,7 @@ export default class SearchList extends Component {
     };
 
     const loadMore =
-      list.length > 0 ? (
+      dataSource.length > 0 ? (
         <div style={{ textAlign: 'center', marginTop: 16 }}>
           <Button onClick={this.fetchMore} style={{ paddingLeft: 48, paddingRight: 48 }}>
             {loading ? (
@@ -201,11 +192,11 @@ export default class SearchList extends Component {
         >
           <List
             size="large"
-            loading={list.length === 0 ? loading : false}
+            loading={dataSource.length === 0 ? loading : false}
             rowKey="id"
             itemLayout="vertical"
             loadMore={loadMore}
-            dataSource={list}
+            dataSource={dataSource}
             renderItem={item => (
               <List.Item
                 key={item.id}

@@ -12,9 +12,6 @@ export default {
       'umi-plugin-react',
       {
         antd: true,
-        dva: {
-          hmr: true,
-        },
         locale: {
           enable: true, // default false
           default: 'zh-CN', // default zh-CN
@@ -24,7 +21,6 @@ export default {
         ...(
           (!process.env.TEST && require('os').platform() === 'darwin')
           ? {
-              dll: ['dva', 'dva/router', 'dva/saga', 'dva/fetch'],
               hardSource: true,
             }
           : {}
@@ -89,7 +85,7 @@ export default {
     ],
   },
 
-  chainWebpack: webpackplugin,
+  //chainWebpack: webpackplugin,
   cssnano: {
     mergeRules: false,
   },

@@ -12,9 +12,12 @@ import {
   Select,
   Popover,
 } from 'antd';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import FooterToolbar from 'components/FooterToolbar';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+import { global } from '@/states/global';
+import { form as formState } from './states/form';
+
 import TableForm from './TableForm';
 import styles from './style.less';
 
@@ -57,10 +60,11 @@ const tableData = [
   },
 ];
 
-@connect(({ global, loading }) => ({
-  collapsed: global.collapsed,
-  submitting: loading.effects['form/submitAdvancedForm'],
-}))
+// @connect(({ global, loading }) => ({
+//   collapsed: global.collapsed,
+//   submitting: loading.effects['form/submitAdvancedForm'],
+// }))
+@connect(global, formState)
 @Form.create()
 export default class AdvancedForm extends PureComponent {
   state = {
@@ -89,16 +93,18 @@ export default class AdvancedForm extends PureComponent {
   };
 
   render() {
-    const { form, dispatch, submitting } = this.props;
+    const { form } = this.props;
+    const { submitAdvancedForm: submitting } = formState.state; 
     const { getFieldDecorator, validateFieldsAndScroll, getFieldsError } = form;
     const validate = () => {
       validateFieldsAndScroll((error, values) => {
         if (!error) {
           // submit the values
-          dispatch({
-            type: 'form/submitAdvancedForm',
-            payload: values,
-          });
+          formState.submitAdvancedForm(values);
+          // dispatch({
+          //   type: 'form/submitAdvancedForm',
+          //   payload: values,
+          // });
         }
       });
     };

@@ -1,18 +1,14 @@
 import React, { PureComponent } from 'react';
 import { List, Card, Icon, Dropdown, Menu, Avatar, Tooltip } from 'antd';
 import numeral from 'numeral';
-import { connect } from 'dva';
+import { connect } from 'bbx';
+import { list } from '@/states/list';
 import { formatWan } from '../../../utils/utils';
 import stylesApplications from '../../List/Applications.less';
 
-@connect(({ list }) => ({
-  list,
-}))
+@connect(list)
 export default class Center extends PureComponent {
   render() {
-    const {
-      list: { list },
-    } = this.props;
     const itemMenu = (
       <Menu>
         <Menu.Item>
@@ -44,12 +40,13 @@ export default class Center extends PureComponent {
         </div>
       </div>
     );
+    const { list : dataSource } = list.state;
     return (
       <List
         rowKey="id"
         className={stylesApplications.filterCardList}
         grid={{ gutter: 24, xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
-        dataSource={list}
+        dataSource={dataSource}
         renderItem={item => (
           <List.Item key={item.id}>
             <Card

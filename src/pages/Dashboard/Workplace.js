@@ -1,12 +1,18 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import moment from 'moment';
-import { connect } from 'dva';
-import { Link } from 'dva/router';
+import { connect } from 'bbx';
+import Link from 'umi/link';
 import { Row, Col, Card, List, Avatar } from 'antd';
 
 import { Radar } from '@/components/Charts';
 import EditableLinkGroup from '@/components/EditableLinkGroup';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+
+import { activities } from './states/activities';
+import { chart } from './states/chart';
+import { user } from '@/states/user';
+import { project } from '@/states/project';
+
 
 import styles from './Workplace.less';
 
@@ -37,43 +43,22 @@ const links = [
   },
 ];
 
-@connect(({ user, project, activities, chart, loading }) => ({
-  currentUser: user.currentUser,
-  project,
-  activities,
-  chart,
-  currentUserLoading: loading.effects['user/fetchCurrent'],
-  projectLoading: loading.effects['project/fetchNotice'],
-  activitiesLoading: loading.effects['activities/fetchList'],
-}))
-export default class Workplace extends PureComponent {
+
+@connect(user, project, activities, chart)
+export default class Workplace extends Component {
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'user/fetchCurrent',
-    });
-    dispatch({
-      type: 'project/fetchNotice',
-    });
-    dispatch({
-      type: 'activities/fetchList',
-    });
-    dispatch({
-      type: 'chart/fetch',
-    });
+    user.fetchCurrent();
+    project.fetchNotice();
+    activities.fetchList();
+    chart.fetch();
   }
 
   componentWillUnmount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'chart/clear',
-    });
+    chart.clear();
   }
 
   renderActivities() {
-    const {
-      activities: { list },
-    } = this.props;
+    const { list } = activities.state;
     return list.map(item => {
       const events = item.template.split(/@\{([^{}]*)\}/gi).map(key => {
         if (item[key]) {
@@ -110,12 +95,19 @@ export default class Workplace extends PureComponent {
   render() {
     const {
       currentUser,
-      currentUserLoading,
-      project: { notice },
-      projectLoading,
-      activitiesLoading,
-      chart: { radarData },
-    } = this.props;
+      fetchCurrentLoading: currentUserLoading,
+    } = user.state;
+
+    const {
+      notice,
+      fetchNoticeLoading: projectLoading,
+    } = project.state;
+
+    const {
+      fetchListLoading: activitiesLoading,
+    } = activities.state;
+
+    const { radarData } = chart.state;
 
     const pageHeaderContent =
       currentUser && Object.keys(currentUser).length ? (

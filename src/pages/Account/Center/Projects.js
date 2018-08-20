@@ -1,24 +1,20 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { List, Card } from 'antd';
 import moment from 'moment';
-import { connect } from 'dva';
+import { connect } from 'bbx';
+import { list } from '@/states/list';
 import AvatarList from '../../../components/AvatarList';
 import stylesProjects from '../../List/Projects.less';
 
-@connect(({ list }) => ({
-  list,
-}))
-export default class Center extends PureComponent {
+@connect(list)
+export default class Center extends Component {
   render() {
-    const {
-      list: { list },
-    } = this.props;
     return (
       <List
         className={stylesProjects.coverCardList}
         rowKey="id"
         grid={{ gutter: 24, xxl: 3, xl: 2, lg: 2, md: 2, sm: 2, xs: 1 }}
-        dataSource={list}
+        dataSource={list.state.list}
         renderItem={item => (
           <List.Item>
             <Card

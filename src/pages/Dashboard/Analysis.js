@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import {
   Row,
@@ -30,6 +30,8 @@ import numeral from 'numeral';
 import GridContent from '@/layouts/GridContent';
 import Yuan from '@/utils/Yuan';
 import { getTimeDistance } from '@/utils/utils';
+import { chart } from './states/chart';
+
 
 import styles from './Analysis.less';
 
@@ -44,10 +46,7 @@ for (let i = 0; i < 7; i += 1) {
   });
 }
 
-@connect(({ chart, loading }) => ({
-  chart,
-  loading: loading.effects['chart/fetch'],
-}))
+@connect(chart)
 class Analysis extends Component {
   constructor(props) {
     super(props);
@@ -73,11 +72,8 @@ class Analysis extends Component {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
     this.reqRef = requestAnimationFrame(() => {
-      dispatch({
-        type: 'chart/fetch',
-      });
+      chart.fetch();
       setTimeout(() => {
         this.setState({
           loading: false,
@@ -87,10 +83,7 @@ class Analysis extends Component {
   }
 
   componentWillUnmount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'chart/clear',
-    });
+    chart.clear();
     cancelAnimationFrame(this.reqRef);
   }
 
@@ -107,25 +100,17 @@ class Analysis extends Component {
   };
 
   handleRangePickerChange = rangePickerValue => {
-    const { dispatch } = this.props;
     this.setState({
       rangePickerValue,
     });
-
-    dispatch({
-      type: 'chart/fetchSalesData',
-    });
+    chart.fetchSalesData();
   };
 
   selectDate = type => {
-    const { dispatch } = this.props;
     this.setState({
       rangePickerValue: getTimeDistance(type),
     });
-
-    dispatch({
-      type: 'chart/fetchSalesData',
-    });
+    chart.fetchSalesData();
   };
 
   isActive(type) {
@@ -144,7 +129,6 @@ class Analysis extends Component {
 
   render() {
     const { rangePickerValue, salesType, loading: propsLoding, currentTabKey } = this.state;
-    const { chart, loading: stateLoading } = this.props;
     const {
       visitData,
       visitData2,
@@ -155,7 +139,8 @@ class Analysis extends Component {
       salesTypeData,
       salesTypeDataOnline,
       salesTypeDataOffline,
-    } = chart;
+      fetchLoading: stateLoading,
+    } = chart.state;
     const loading = propsLoding || stateLoading;
     const salesPieData =
       salesType === 'all'

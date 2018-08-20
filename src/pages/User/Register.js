@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
-import { connect } from 'dva';
-import { routerRedux, Link } from 'dva/router';
+import { connect } from 'bbx';
+import Link from 'umi/link';
+import router from 'umi/router';
 import { Form, Input, Button, Select, Row, Col, Popover, Progress } from 'antd';
+import { register } from './states/register';
 import styles from './Register.less';
+
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -20,10 +23,7 @@ const passwordProgressMap = {
   poor: 'exception',
 };
 
-@connect(({ register, loading }) => ({
-  register,
-  submitting: loading.effects['register/submit'],
-}))
+@connect(register)
 @Form.create()
 export default class Register extends Component {
   state = {
@@ -35,17 +35,15 @@ export default class Register extends Component {
   };
 
   componentDidUpdate() {
-    const { form, register, dispatch } = this.props;
+    const { form } = this.props;
     const account = form.getFieldValue('mail');
-    if (register.status === 'ok') {
-      dispatch(
-        routerRedux.push({
-          pathname: '/user/register-result',
-          state: {
-            account,
-          },
-        })
-      );
+    if (register.state.status === 'ok') {
+      router.push({
+        pathname: '/user/register-result',
+        state: {
+          account,
+        },
+      })
     }
   }
 
@@ -79,16 +77,13 @@ export default class Register extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    const { form, dispatch } = this.props;
+    const { form } = this.props;
     form.validateFields({ force: true }, (err, values) => {
       if (!err) {
         const { prefix } = this.state;
-        dispatch({
-          type: 'register/submit',
-          payload: {
-            ...values,
-            prefix,
-          },
+        register.submit({
+          ...values,
+          prefix,
         });
       }
     });
@@ -162,7 +157,8 @@ export default class Register extends Component {
   };
 
   render() {
-    const { form, submitting } = this.props;
+    const { form } = this.props;
+    const { submitLoading : submitting } = register.state;
     const { getFieldDecorator } = form;
     const { count, prefix, help, visible } = this.state;
     return (

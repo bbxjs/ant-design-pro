@@ -1,45 +1,37 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import numeral from 'numeral';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import { Row, Col, Form, Card, Select, Icon, Avatar, List, Tooltip, Dropdown, Menu } from 'antd';
 import TagSelect from 'components/TagSelect';
 import StandardFormRow from 'components/StandardFormRow';
 
 import { formatWan } from '../../utils/utils';
+import { list as listState } from '@/states/list';
 
 import styles from './Applications.less';
 
 const { Option } = Select;
 const FormItem = Form.Item;
 
+
 @Form.create()
-@connect(({ list, loading }) => ({
-  list,
-  loading: loading.models.list,
-}))
-export default class FilterCardList extends PureComponent {
+@connect(listState)
+export default class FilterCardList extends Component {
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'list/fetch',
-      payload: {
-        count: 8,
-      },
+    listState.fetch({
+      count: 8,
     });
   }
 
   handleFormSubmit = () => {
-    const { form, dispatch } = this.props;
+    const { form } = this.props;
     // setTimeout 用于保证获取表单值是在所有表单字段更新完毕的时候
     setTimeout(() => {
       form.validateFields(err => {
         if (!err) {
           // eslint-disable-next-line
-          dispatch({
-            type: 'list/fetch',
-            payload: {
-              count: 8,
-            },
+          listState.fetch({
+            count: 8,
           });
         }
       });
@@ -47,12 +39,11 @@ export default class FilterCardList extends PureComponent {
   };
 
   render() {
-    const {
-      list: { list },
-      loading,
-      form,
-    } = this.props;
+    const { form } = this.props;
     const { getFieldDecorator } = form;
+    const { list, fetchLoading, submitLoading } = listState.state;
+    const loading = fetchLoading || submitLoading;
+
 
     const CardInfo = ({ activeUser, newUser }) => (
       <div className={styles.cardInfo}>

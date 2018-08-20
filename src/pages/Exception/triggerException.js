@@ -1,34 +1,23 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Button, Spin, Card } from 'antd';
-import { connect } from 'dva';
+import { connect } from 'bbx';
+import { error } from './states/error';
 import styles from './style.less';
 
-@connect(state => ({
-  isloading: state.error.isloading,
-}))
-export default class TriggerException extends PureComponent {
-  state = {
-    isloading: false,
-  };
+@connect(error)
+export default class TriggerException extends Component {
 
   triggerError = code => {
-    this.setState({
-      isloading: true,
-    });
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'error/query',
-      payload: {
-        code,
-      },
+    error.query({
+      code,
     });
   };
 
   render() {
-    const { isloading } = this.state;
+    const { queryLoading : loading } = error.state;
     return (
       <Card>
-        <Spin spinning={isloading} wrapperClassName={styles.trigger}>
+        <Spin spinning={!!loading} wrapperClassName={styles.trigger}>
           <Button type="danger" onClick={() => this.triggerError(401)}>
             触发401
           </Button>

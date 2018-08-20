@@ -1,10 +1,11 @@
 import React, { Component, Fragment } from 'react';
 import { formatMessage, FormattedMessage } from 'umi/locale';
 import { Form, Input, Upload, Select, Button } from 'antd';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import styles from './BaseView.less';
 import GeographicView from './GeographicView';
 import PhoneView from './PhoneView';
+import { user } from '@/states/user';
 // import { getTimeDistance } from '../../../utils/utils';
 
 const FormItem = Form.Item;
@@ -49,9 +50,7 @@ const validatorPhone = (rule, value, callback) => {
   callback();
 };
 
-@connect(({ user }) => ({
-  currentUser: user.currentUser,
-}))
+@connect(user)
 @Form.create()
 class BaseView extends Component {
   componentDidMount() {
@@ -59,7 +58,8 @@ class BaseView extends Component {
   }
 
   setBaseInfo = () => {
-    const { currentUser, form } = this.props;
+    const { form } = this.props;
+    const { currentUser } = user.state;
     Object.keys(form.getFieldsValue()).forEach(key => {
       const obj = {};
       obj[key] = currentUser[key] || null;
@@ -68,7 +68,7 @@ class BaseView extends Component {
   };
 
   getAvatarURL() {
-    const { currentUser } = this.props;
+    const { currentUser } = user.state;
     if (currentUser.avatar) {
       return currentUser.avatar;
     }

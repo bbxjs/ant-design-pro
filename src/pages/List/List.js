@@ -1,22 +1,20 @@
 import React, { Component } from 'react';
-import { routerRedux } from 'dva/router';
-import { connect } from 'dva';
+import router from 'umi/router';
 import { Input } from 'antd';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
 
-@connect()
 export default class SearchList extends Component {
   handleTabChange = key => {
-    const { dispatch, match } = this.props;
+    const { match } = this.props;
     switch (key) {
-      case 'Articles':
-        dispatch(routerRedux.push(`${match.url}/Articles`));
+      case 'articles':
+        router.push(`${match.url}/articles`);
         break;
-      case 'Applications':
-        dispatch(routerRedux.push(`${match.url}/Applications`));
+      case 'applications':
+        router.push(`${match.url}/applications`);
         break;
-      case 'Projects':
-        dispatch(routerRedux.push(`${match.url}/Projects`));
+      case 'projects':
+        router.push(`${match.url}/projects`);
         break;
       default:
         break;
@@ -26,7 +24,7 @@ export default class SearchList extends Component {
   render() {
     const tabList = [
       {
-        key: 'Articles',
+        key: 'articles',
         tab: '文章',
       },
       {

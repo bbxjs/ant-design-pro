@@ -1,10 +1,12 @@
 import React, { PureComponent } from 'react';
 import { Spin } from 'antd';
-import { connect } from 'dva';
 import { enquireScreen, unenquireScreen } from 'enquire-js';
 import BasicLayout from './BasicLayout';
 // TODO: should use this.props.routes
 import routerConfig from '../../config/router.config';
+import { user } from '@/states/user';
+import { setting } from '@/states/setting';
+
 
 // Conversion router to menu.
 function formatter(data, parentPath = '', parentAuthority, parentName) {
@@ -41,7 +43,6 @@ class LoadingPage extends PureComponent {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
     this.enquireHandler = enquireScreen(mobile => {
       const { isMobile } = this.state;
       if (isMobile !== mobile) {
@@ -50,9 +51,7 @@ class LoadingPage extends PureComponent {
         });
       }
     });
-    dispatch({
-      type: 'user/fetchCurrent',
-    });
+    user.fetchCurrent();
     this.hideLoading();
     this.initSetting();
   }
@@ -71,10 +70,7 @@ class LoadingPage extends PureComponent {
    * get setting from url params
    */
   initSetting() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'setting/getSetting',
-    });
+    setting.getSetting();
   }
 
   render() {
@@ -106,4 +102,4 @@ class LoadingPage extends PureComponent {
   }
 }
 
-export default connect()(LoadingPage);
+export default LoadingPage;

@@ -1,5 +1,5 @@
-import React, { PureComponent } from 'react';
-import { connect } from 'dva';
+import React, { Component } from 'react';
+import { connect } from 'bbx';
 import { Row, Col, Card, Tooltip } from 'antd';
 import { Pie, WaterWave, Gauge, TagCloud } from 'components/Charts';
 import NumberInfo from 'components/NumberInfo';
@@ -9,6 +9,8 @@ import numeral from 'numeral';
 import GridContent from '@/layouts/GridContent';
 
 import Authorized from '@/utils/Authorized';
+import { monitor } from './states/monitor';
+
 import styles from './Monitor.less';
 
 const { Secured } = Authorized;
@@ -21,22 +23,15 @@ const havePermissionAsync = new Promise(resolve => {
   setTimeout(() => resolve(), 1000);
 });
 @Secured(havePermissionAsync)
-@connect(({ monitor, loading }) => ({
-  monitor,
-  loading: loading.models.monitor,
-}))
-export default class Monitor extends PureComponent {
+@connect(monitor)
+export default class Monitor extends Component {
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'monitor/fetchTags',
-    });
+    monitor.fetchTags();
   }
 
   render() {
-    const { monitor, loading } = this.props;
-    const { tags } = monitor;
-
+    console.log('render');
+    const { tags, fetchTagsLoading: loading } = monitor.state;
     return (
       <GridContent>
         <Row gutter={24}>

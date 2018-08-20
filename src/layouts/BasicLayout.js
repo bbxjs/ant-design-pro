@@ -3,18 +3,20 @@ import { Layout } from 'antd';
 import DocumentTitle from 'react-document-title';
 import deepEqual from 'lodash.isequal';
 import memoizeOne from 'memoize-one';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import { ContainerQuery } from 'react-container-query';
 import classNames from 'classnames';
 import pathToRegexp from 'path-to-regexp';
 import { formatMessage } from 'umi/locale';
 import SiderMenu from '../components/SiderMenu';
 import Authorized from '../utils/Authorized';
-import SettingDarwer from '../components/SettingDarwer';
+//import SettingDarwer from '../components/SettingDarwer';
 import logo from '../assets/logo.svg';
 import Footer from './Footer';
 import Header from './Header';
 import Context from './MenuContext';
+import { global } from '@/states/global';
+import { setting } from '@/states/setting';
 
 const { Content } = Layout;
 const { check } = Authorized;
@@ -63,7 +65,13 @@ const query = {
   },
 };
 
-class BasicLayout extends React.PureComponent {
+// connect(({ global, setting }) => ({
+//   collapsed: global.collapsed,
+//   layout: setting.layout,
+//   ...setting,
+// }))(BasicLayout)
+@connect(global, setting)
+class BasicLayout extends React.Component {
   state = {
     rendering: true,
   };
@@ -99,7 +107,9 @@ class BasicLayout extends React.PureComponent {
   };
 
   getLayoutStyle = () => {
-    const { fixSiderbar, collapsed, layout } = this.props;
+    const { fixSiderbar, layout } = setting.state;
+    const { collapsed } = global.state;
+
     if (fixSiderbar && layout !== 'topmenu') {
       return {
         paddingLeft: collapsed ? '80px' : '256px',
@@ -109,7 +119,7 @@ class BasicLayout extends React.PureComponent {
   };
 
   getContentStyle = () => {
-    const { fixedHeader } = this.props;
+    const { fixedHeader } = setting.state;
     return {
       margin: '24px 24px 0',
       paddingTop: fixedHeader ? 64 : 0,
@@ -138,11 +148,7 @@ class BasicLayout extends React.PureComponent {
   };
 
   handleMenuCollapse = collapsed => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'global/changeLayoutCollapsed',
-      payload: collapsed,
-    });
+    global.changeLayoutCollapsed(collapsed);
   };
   componentDidMount() {
     this.renderRef = requestAnimationFrame(() => {
@@ -157,11 +163,15 @@ class BasicLayout extends React.PureComponent {
   render() {
     const {
       isMobile,
-      silderTheme,
-      layout: PropsLayout,
       children,
       location: { pathname },
     } = this.props;
+
+    const {
+      silderTheme,
+      layout: PropsLayout,
+    } = setting.state;
+
     const isTop = PropsLayout === 'topmenu';
     const layout = (
       <Layout>
@@ -192,14 +202,10 @@ class BasicLayout extends React.PureComponent {
             )}
           </ContainerQuery>
         </DocumentTitle>
-        {this.state.rendering ? null : <SettingDarwer />}
+        {/* {this.state.rendering ? null : <SettingDarwer />} */}
       </React.Fragment>
     );
   }
 }
 
-export default connect(({ global, setting }) => ({
-  collapsed: global.collapsed,
-  layout: setting.layout,
-  ...setting,
-}))(BasicLayout);
+export default BasicLayout;

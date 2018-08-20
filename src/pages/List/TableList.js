@@ -1,5 +1,5 @@
-import React, { PureComponent, Fragment } from 'react';
-import { connect } from 'dva';
+import React, { Component, Fragment } from 'react';
+import { connect } from 'bbx';
 import moment from 'moment';
 import {
   Row,
@@ -23,6 +23,7 @@ import {
 } from 'antd';
 import StandardTable from 'components/StandardTable';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+import { rule } from './states/rule';
 
 import styles from './TableList.less';
 
@@ -65,7 +66,7 @@ const CreateForm = Form.create()(props => {
 });
 
 @Form.create()
-class UpdateForm extends PureComponent {
+class UpdateForm extends Component {
   constructor(props) {
     super(props);
 
@@ -266,12 +267,9 @@ class UpdateForm extends PureComponent {
 }
 
 /* eslint react/no-multi-comp:0 */
-@connect(({ rule, loading }) => ({
-  rule,
-  loading: loading.models.rule,
-}))
+@connect(rule)
 @Form.create()
-export default class TableList extends PureComponent {
+export default class TableList extends Component {
   columns = [
     {
       title: '规则名称',
@@ -343,14 +341,10 @@ export default class TableList extends PureComponent {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'rule/fetch',
-    });
+    rule.fetch();
   }
 
   handleStandardTableChange = (pagination, filtersArg, sorter) => {
-    const { dispatch } = this.props;
     const { formValues } = this.state;
 
     const filters = Object.keys(filtersArg).reduce((obj, key) => {
@@ -369,22 +363,17 @@ export default class TableList extends PureComponent {
       params.sorter = `${sorter.field}_${sorter.order}`;
     }
 
-    dispatch({
-      type: 'rule/fetch',
-      payload: params,
-    });
+    rule.fetch(params);
   };
 
   handleFormReset = () => {
-    const { form, dispatch } = this.props;
+    const { form } = this.props;
     form.resetFields();
     this.setState({
       formValues: {},
     });
-    dispatch({
-      type: 'rule/fetch',
-      payload: {},
-    });
+
+    rule.fetch();
   };
 
   toggleForm = () => {
@@ -395,23 +384,19 @@ export default class TableList extends PureComponent {
   };
 
   handleMenuClick = e => {
-    const { dispatch } = this.props;
     const { selectedRows } = this.state;
 
     if (!selectedRows) return;
     switch (e.key) {
       case 'remove':
-        dispatch({
-          type: 'rule/remove',
-          payload: {
-            key: selectedRows.map(row => row.key),
-          },
-          callback: () => {
-            this.setState({
-              selectedRows: [],
-            });
-          },
+        rule.remove({
+          key: selectedRows.map(row => row.key),
+        }).then(() => {
+          this.setState({
+            selectedRows: [],
+          });
         });
+
         break;
       default:
         break;
@@ -427,7 +412,7 @@ export default class TableList extends PureComponent {
   handleSearch = e => {
     e.preventDefault();
 
-    const { dispatch, form } = this.props;
+    const { form } = this.props;
 
     form.validateFields((err, fieldsValue) => {
       if (err) return;
@@ -441,10 +426,7 @@ export default class TableList extends PureComponent {
         formValues: values,
       });
 
-      dispatch({
-        type: 'rule/fetch',
-        payload: values,
-      });
+      rule.fetch(values);
     });
   };
 
@@ -462,12 +444,8 @@ export default class TableList extends PureComponent {
   };
 
   handleAdd = fields => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'rule/add',
-      payload: {
-        desc: fields.desc,
-      },
+    rule.add({
+      desc: fields.desc,
     });
 
     message.success('添加成功');
@@ -475,15 +453,11 @@ export default class TableList extends PureComponent {
   };
 
   handleUpdate = fields => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'rule/update',
-      payload: {
-        name: fields.name,
-        desc: fields.desc,
-        key: fields.key,
-      },
-    });
+    rule.update({
+      name: fields.name,
+      desc: fields.desc,
+      key: fields.key,
+    })
 
     message.success('配置成功');
     this.handleUpdateModalVisible();
@@ -609,10 +583,10 @@ export default class TableList extends PureComponent {
   }
 
   render() {
-    const {
-      rule: { data },
-      loading,
-    } = this.props;
+    console.log(new Date * 1)
+    const { data, fetchLoading, addLoading, removeLoading, updateLoading } = rule.state;
+    const loading = fetchLoading || addLoading || removeLoading || updateLoading;
+
     const { selectedRows, modalVisible, updateModalVisible, stepFormValues } = this.state;
     const menu = (
       <Menu onClick={this.handleMenuClick} selectedKeys={[]}>

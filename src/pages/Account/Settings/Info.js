@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
-import { connect } from 'dva';
-import { routerRedux } from 'dva/router';
+import { connect } from 'bbx';
+import router from 'umi/router';
 import { FormattedMessage } from 'umi/locale';
 import { Menu } from 'antd';
 import styles from './Info.less';
 import GridContent from '@/layouts/GridContent';
+import { user } from '@/states/user';
 
 const { Item } = Menu;
 
-@connect(({ user }) => ({
-  currentUser: user.currentUser,
-}))
+@connect(user)
 export default class Info extends Component {
   constructor(props) {
     super(props);
@@ -71,8 +70,7 @@ export default class Info extends Component {
   };
 
   selectKey = ({ key }) => {
-    const { dispatch } = this.props;
-    dispatch(routerRedux.push(`/account/settings/${key}`));
+    router.push(`/account/settings/${key}`);
     this.setState({
       selectKey: key,
     });
@@ -98,7 +96,9 @@ export default class Info extends Component {
   };
 
   render() {
-    const { children, currentUser } = this.props;
+    const { children } = this.props;
+    const { currentUser } = user.state;
+
     if (!currentUser.userid) {
       return '';
     }

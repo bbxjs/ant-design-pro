@@ -1,18 +1,17 @@
-import React, { PureComponent } from 'react';
-import { connect } from 'dva';
-import { Link, routerRedux } from 'dva/router';
+import React, { Component } from 'react';
+import { connect } from 'bbx';
+import Link from 'umi/link';
+import router from 'umi/router';
 import { Card, Row, Col, Icon, Avatar, Tag, Divider, Spin, Input } from 'antd';
 import GridContent from '@/layouts/GridContent';
+import { list } from '@/states/list';
+import { user } from '@/states/user';
+import { project } from '@/states/project';
 import styles from './Center.less';
 
-@connect(({ loading, user, project }) => ({
-  listLoading: loading.effects['list/fetch'],
-  currentUser: user.currentUser,
-  currentUserLoading: loading.effects['user/fetchCurrent'],
-  project,
-  projectLoading: loading.effects['project/fetchNotice'],
-}))
-export default class Center extends PureComponent {
+
+@connect(list, user, project)
+export default class Center extends Component {
   state = {
     newTags: [],
     inputVisible: false,
@@ -20,32 +19,24 @@ export default class Center extends PureComponent {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'user/fetchCurrent',
+    user.fetchCurrent();
+    list.fetch({
+      count: 8,
     });
-    dispatch({
-      type: 'list/fetch',
-      payload: {
-        count: 8,
-      },
-    });
-    dispatch({
-      type: 'project/fetchNotice',
-    });
+    project.fetchNotice();
   }
 
   onTabChange = key => {
-    const { dispatch, match } = this.props;
+    const { match } = this.props;
     switch (key) {
       case 'articles':
-        dispatch(routerRedux.push(`${match.url}/articles`));
+        router.push(`${match.url}/articles`);
         break;
       case 'applications':
-        dispatch(routerRedux.push(`${match.url}/applications`));
+        router.push(`${match.url}/applications`);
         break;
       case 'projects':
-        dispatch(routerRedux.push(`${match.url}/projects`));
+        router.push(`${match.url}/projects`);
         break;
       default:
         break;
@@ -80,16 +71,19 @@ export default class Center extends PureComponent {
 
   render() {
     const { newTags, inputVisible, inputValue } = this.state;
+    const { match, location, children } = this.props;
+
     const {
-      listLoading,
       currentUser,
-      currentUserLoading,
-      project: { notice },
-      projectLoading,
-      match,
-      location,
-      children,
-    } = this.props;
+      fetchCurrentLoading : currentUserLoading,
+    } = user.state;
+
+    const { fetchLoading : listLoading } = list.state;
+
+    const {
+      notice,
+      fetchNoticeLoading : projectLoading,
+    } = project.state;
 
     const operationTabList = [
       {

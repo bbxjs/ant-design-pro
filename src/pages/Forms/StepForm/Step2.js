@@ -1,8 +1,9 @@
 import React from 'react';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import { Form, Input, Button, Alert, Divider } from 'antd';
-import { routerRedux } from 'dva/router';
+import router from 'umi/router';
 import { digitUppercase } from '../../../utils/utils';
+import { form as formState } from '../states/form';
 import styles from './style.less';
 
 const formItemLayout = {
@@ -14,25 +15,21 @@ const formItemLayout = {
   },
 };
 
+@connect(formState)
 @Form.create()
-class Step2 extends React.PureComponent {
+class Step2 extends React.Component {
   render() {
-    const { form, data, dispatch, submitting } = this.props;
+    const { step: data, submitStepFormLoading: submitting } = formState.state;
+    const { form } = this.props;
     const { getFieldDecorator, validateFields } = form;
     const onPrev = () => {
-      dispatch(routerRedux.push('/form/step-form/info'));
+      router.push('/form/step-form/info')
     };
     const onValidateForm = e => {
       e.preventDefault();
       validateFields((err, values) => {
         if (!err) {
-          dispatch({
-            type: 'form/submitStepForm',
-            payload: {
-              ...data,
-              ...values,
-            },
-          });
+          formState.submitStepForm(values);
         }
       });
     };
@@ -96,7 +93,4 @@ class Step2 extends React.PureComponent {
   }
 }
 
-export default connect(({ form, loading }) => ({
-  submitting: loading.effects['form/submitStepForm'],
-  data: form.step,
-}))(Step2);
+export default Step2;

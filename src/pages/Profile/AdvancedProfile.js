@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import Debounce from 'lodash-decorators/debounce';
 import Bind from 'lodash-decorators/bind';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import {
   Button,
   Menu,
@@ -20,6 +20,7 @@ import {
 import classNames from 'classnames';
 import DescriptionList from 'components/DescriptionList';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+import { profile } from './states/profile';
 import styles from './AdvancedProfile.less';
 
 const { Step } = Steps;
@@ -180,10 +181,7 @@ const columns = [
   },
 ];
 
-@connect(({ profile, loading }) => ({
-  profile,
-  loading: loading.effects['profile/fetchAdvanced'],
-}))
+@connect(profile)
 export default class AdvancedProfile extends Component {
   state = {
     operationkey: 'tab1',
@@ -191,10 +189,7 @@ export default class AdvancedProfile extends Component {
   };
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'profile/fetchAdvanced',
-    });
+    profile.fetchAdvanced();
 
     this.setStepDirection();
     window.addEventListener('resize', this.setStepDirection, { passive: true });
@@ -227,8 +222,7 @@ export default class AdvancedProfile extends Component {
 
   render() {
     const { stepDirection, operationkey } = this.state;
-    const { profile, loading } = this.props;
-    const { advancedOperation1, advancedOperation2, advancedOperation3 } = profile;
+    const { advancedOperation1, advancedOperation2, advancedOperation3, fetchAdvancedLoading : loading } = profile.state;
     const contentList = {
       tab1: (
         <Table

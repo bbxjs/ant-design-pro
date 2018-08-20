@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import {
   Form,
   Input,
@@ -13,6 +13,8 @@ import {
   Tooltip,
 } from 'antd';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+import { form as formState } from './states/form';
+
 import styles from './style.less';
 
 const FormItem = Form.Item;
@@ -20,26 +22,22 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 
-@connect(({ loading }) => ({
-  submitting: loading.effects['form/submitRegularForm'],
-}))
+
+@connect(formState)
 @Form.create()
 export default class BasicForms extends PureComponent {
   handleSubmit = e => {
-    const { dispatch, form } = this.props;
+    const { form } = this.props;
     e.preventDefault();
     form.validateFieldsAndScroll((err, values) => {
       if (!err) {
-        dispatch({
-          type: 'form/submitRegularForm',
-          payload: values,
-        });
+        formState.submitRegularForm(values);
       }
     });
   };
 
   render() {
-    const { submitting } = this.props;
+    const { submitRegularFormLoading: submitting } = formState.state;
     const {
       form: { getFieldDecorator, getFieldValue },
     } = this.props;

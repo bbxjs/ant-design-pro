@@ -1,32 +1,23 @@
-import React, { PureComponent } from 'react';
-import { connect } from 'dva';
+import React, { Component } from 'react';
+import { connect } from 'bbx';
 import { Card, Button, Icon, List } from 'antd';
 
 import Ellipsis from 'components/Ellipsis';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
+import { list } from '@/states/list';
 
 import styles from './CardList.less';
 
-@connect(({ list, loading }) => ({
-  list,
-  loading: loading.models.list,
-}))
-export default class CardList extends PureComponent {
+@connect(list)
+export default class CardList extends Component {
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'list/fetch',
-      payload: {
-        count: 8,
-      },
+    list.fetch({
+      count: 8,
     });
   }
 
   render() {
-    const {
-      list: { list },
-      loading,
-    } = this.props;
+    const { list: dataSource, fetchLoading: loading } = list.state;
 
     const content = (
       <div className={styles.pageHeaderContent}>
@@ -67,7 +58,7 @@ export default class CardList extends PureComponent {
             rowKey="id"
             loading={loading}
             grid={{ gutter: 24, lg: 3, md: 2, sm: 1, xs: 1 }}
-            dataSource={['', ...list]}
+            dataSource={['', ...dataSource]}
             renderItem={item =>
               item ? (
                 <List.Item key={item.id}>

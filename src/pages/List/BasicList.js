@@ -1,7 +1,7 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { findDOMNode } from 'react-dom';
 import moment from 'moment';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import {
   List,
   Card,
@@ -23,6 +23,7 @@ import {
 
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
 import Result from '@/components/Result';
+import { list } from '@/states/list';
 
 import styles from './BasicList.less';
 
@@ -32,12 +33,9 @@ const RadioGroup = Radio.Group;
 const SelectOption = Select.Option;
 const { Search, TextArea } = Input;
 
-@connect(({ list, loading }) => ({
-  list,
-  loading: loading.models.list,
-}))
+@connect(list)
 @Form.create()
-export default class BasicList extends PureComponent {
+export default class BasicList extends Component {
   formLayout = {
     labelCol: { span: 7 },
     wrapperCol: { span: 13 },
@@ -46,13 +44,9 @@ export default class BasicList extends PureComponent {
   state = { visible: false, done: false };
 
   componentDidMount() {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'list/fetch',
-      payload: {
-        count: 5,
-      },
-    });
+    list.fetch({
+      count: 5,
+    })
   }
 
   showModal = () => {
@@ -86,7 +80,7 @@ export default class BasicList extends PureComponent {
 
   handleSubmit = e => {
     e.preventDefault();
-    const { dispatch, form } = this.props;
+    const { form } = this.props;
     const { current } = this.state;
     const id = current ? current.id : '';
 
@@ -96,26 +90,23 @@ export default class BasicList extends PureComponent {
       this.setState({
         done: true,
       });
-      dispatch({
-        type: 'list/submit',
-        payload: { id, ...fieldsValue },
+      list.submit({
+        id,
+        ...fieldsValue,
       });
     });
   };
 
   deleteItem = id => {
-    const { dispatch } = this.props;
-    dispatch({
-      type: 'list/submit',
-      payload: { id },
-    });
+    list.submit({
+      id,
+    })
   };
 
   render() {
-    const {
-      list: { list },
-      loading,
-    } = this.props;
+    const { list: dataSource, fetchLoading, submitLoading } = list.state;
+    const loading = fetchLoading || submitLoading;
+
     const {
       form: { getFieldDecorator },
     } = this.props;
@@ -295,7 +286,7 @@ export default class BasicList extends PureComponent {
               rowKey="id"
               loading={loading}
               pagination={paginationProps}
-              dataSource={list}
+              dataSource={dataSource}
               renderItem={item => (
                 <List.Item
                   actions={[

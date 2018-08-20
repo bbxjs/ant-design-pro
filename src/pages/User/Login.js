@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
-import { connect } from 'dva';
-import { Link } from 'dva/router';
+import { connect } from 'bbx';
+import Link from 'umi/link';
 import { Checkbox, Alert, Icon } from 'antd';
 import Login from 'components/Login';
+import { login as loginState } from './states/login';
 import styles from './Login.less';
 
 const { Tab, UserName, Password, Mobile, Captcha, Submit } = Login;
 
-@connect(({ login, loading }) => ({
-  login,
-  submitting: loading.effects['login/login'],
-}))
+@connect(loginState)
 export default class LoginPage extends Component {
   state = {
     type: 'account',
@@ -27,13 +25,9 @@ export default class LoginPage extends Component {
         if (err) {
           reject(err);
         } else {
-          const { dispatch } = this.props;
-          dispatch({
-            type: 'login/getCaptcha',
-            payload: values.mobile,
-          })
+          loginState.getCaptcha(values.mobile)
             .then(resolve)
-            .catch(reject);
+            .then(reject)
         }
       });
     });
@@ -42,14 +36,10 @@ export default class LoginPage extends Component {
   handleSubmit = (err, values) => {
     const { type } = this.state;
     if (!err) {
-      const { dispatch } = this.props;
-      dispatch({
-        type: 'login/login',
-        payload: {
-          ...values,
-          type,
-        },
-      });
+      loginState.login({
+        ...values,
+        type,
+      })
     }
   };
 
@@ -64,7 +54,8 @@ export default class LoginPage extends Component {
   };
 
   render() {
-    const { login, submitting } = this.props;
+    const login = loginState.state;
+    const { loginLoading: submitting } = login;
     const { type, autoLogin } = this.state;
     return (
       <div className={styles.main}>

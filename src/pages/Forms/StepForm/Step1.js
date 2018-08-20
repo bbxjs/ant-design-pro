@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import { Form, Input, Button, Select, Divider } from 'antd';
-import { routerRedux } from 'dva/router';
+import router from 'umi/router';
+import { form as formState } from '../states/form';
 import styles from './style.less';
 
 const { Option } = Select;
@@ -15,22 +16,17 @@ const formItemLayout = {
   },
 };
 
-@connect(({ form }) => ({
-  data: form.step,
-}))
+@connect(formState)
 @Form.create()
-export default class Step1 extends React.PureComponent {
+export default class Step1 extends React.Component {
   render() {
-    const { form, dispatch, data } = this.props;
-    const { getFieldDecorator, validateFields } = form;
+    const { step: data } = formState.state;
+    const { getFieldDecorator, validateFields } = this.props.form;
     const onValidateForm = () => {
       validateFields((err, values) => {
         if (!err) {
-          dispatch({
-            type: 'form/saveStepFormData',
-            payload: values,
-          });
-          dispatch(routerRedux.push('/form/step-form/confirm'));
+          formState.saveStepFormData(values);
+          router.push('/form/step-form/confirm');
         }
       });
     };

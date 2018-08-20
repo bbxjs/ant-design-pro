@@ -1,3 +1,30 @@
+## Ant Design Pro with bbx
+
+采用 [umi](https://umijs.org/) + [bbx](https://bbxjs.github.io/)
+
+```
+$ git clone https://github.com/bbxjs/ant-design-pro.git
+$ git checkout bbx
+$ npm install
+$ npm start
+```
+
+fork from https://github.com/ant-design/ant-design-pro/tree/v2 （原项目采用的 [umi](https://umijs.org/) + [dva](https://dvajs.com/)）
+
+## 功能
+
+- [x] v2 分支全部页面和功能
+- [ ] 主题切换功能
+
+
+https://github.com/ant-design/ant-design-pro/tree/v2 
+
+
+
+
+
+
+
 [Русский](./README.ru-RU.md) | English | [简体中文](./README.zh-CN.md)
 
 # Ant Design Pro

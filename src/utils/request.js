@@ -1,4 +1,4 @@
-import fetch from 'dva/fetch';
+import fetch from 'isomorphic-fetch';
 import { notification } from 'antd';
 import router from 'umi/router';
 import hash from 'hash.js';

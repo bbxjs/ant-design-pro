@@ -1,18 +1,18 @@
 import React, { Fragment } from 'react';
-import { connect } from 'dva';
+import { connect } from 'bbx';
 import { Button, Row, Col } from 'antd';
-import { routerRedux } from 'dva/router';
+import router from 'umi/router';
 import Result from 'components/Result';
+import { form } from '../states/form';
+
 import styles from './style.less';
 
-@connect(({ form }) => ({
-  data: form.step,
-}))
-export default class Step3 extends React.PureComponent {
+@connect(form)
+export default class Step3 extends React.Component {
   render() {
-    const { dispatch, data } = this.props;
+    const { step: data }= form.state;
     const onFinish = () => {
-      dispatch(routerRedux.push('/form/step-form/info'));
+      router.push('/form/step-form/info');
     };
     const information = (
       <div className={styles.information}>

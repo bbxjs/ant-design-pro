@@ -1,18 +1,16 @@
 import React from 'react';
-import { routerRedux, Route, Switch } from 'dva/router';
+import { Route, Switch } from 'react-router-dom';
 import { getRouterData } from './common/router';
 import Authorized from './utils/Authorized';
 import { getQueryPath } from './utils/utils';
 
-const { ConnectedRouter } = routerRedux;
 const { AuthorizedRoute } = Authorized;
 
-function RouterConfig({ history, app }) {
+function RouterConfig({ app }) {
   const routerData = getRouterData(app);
   const UserLayout = routerData['/user'].component;
   const BasicLayout = routerData['/'].component;
   return (
-    <ConnectedRouter history={history}>
       <Switch>
         <Route path="/user" component={UserLayout} />
         <AuthorizedRoute
@@ -24,7 +22,6 @@ function RouterConfig({ history, app }) {
           })}
         />
       </Switch>
-    </ConnectedRouter>
   );
 }
 
