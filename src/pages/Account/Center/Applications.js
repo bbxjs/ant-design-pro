@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { List, Card, Icon, Dropdown, Menu, Avatar, Tooltip } from 'antd';
 import numeral from 'numeral';
 import { connect } from 'bbx';
@@ -7,7 +7,7 @@ import { formatWan } from '../../../utils/utils';
 import stylesApplications from '../../List/Applications.less';
 
 @connect(list)
-export default class Center extends PureComponent {
+export default class Center extends Component {
   render() {
     const itemMenu = (
       <Menu>

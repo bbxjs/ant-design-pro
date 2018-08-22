@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { List, Icon, Avatar, Tag } from 'antd';
 import moment from 'moment';
 import { connect } from 'bbx';
@@ -7,7 +7,7 @@ import stylesArticles from '../../List/Articles.less';
 import styles from './Articles.less';
 
 @connect(list)
-export default class Center extends PureComponent {
+export default class Center extends Component {
   render() {
     const IconText = ({ type, text }) => (
       <span>

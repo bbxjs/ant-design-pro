@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import {
   Card,
   Button,
@@ -15,7 +15,6 @@ import {
 import { connect } from 'bbx';
 import FooterToolbar from 'components/FooterToolbar';
 import PageHeaderLayout from '@/layouts/PageHeaderLayout';
-import { global } from '@/states/global';
 import { form as formState } from './states/form';
 
 import TableForm from './TableForm';
@@ -60,13 +59,10 @@ const tableData = [
   },
 ];
 
-// @connect(({ global, loading }) => ({
-//   collapsed: global.collapsed,
-//   submitting: loading.effects['form/submitAdvancedForm'],
-// }))
-@connect(global, formState)
+
+@connect(formState)
 @Form.create()
-export default class AdvancedForm extends PureComponent {
+export default class AdvancedForm extends Component {
   state = {
     width: '100%',
   };

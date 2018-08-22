@@ -128,6 +128,7 @@ class Analysis extends Component {
   }
 
   render() {
+    
     const { rangePickerValue, salesType, loading: propsLoding, currentTabKey } = this.state;
     const {
       visitData,
@@ -148,7 +149,6 @@ class Analysis extends Component {
         : salesType === 'online'
           ? salesTypeDataOnline
           : salesTypeDataOffline;
-
     const menu = (
       <Menu>
         <Menu.Item>操作一</Menu.Item>

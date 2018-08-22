@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { connect } from 'bbx';
 import {
   Form,
@@ -25,7 +25,7 @@ const { TextArea } = Input;
 
 @connect(formState)
 @Form.create()
-export default class BasicForms extends PureComponent {
+export default class BasicForms extends Component {
   handleSubmit = e => {
     const { form } = this.props;
     e.preventDefault();

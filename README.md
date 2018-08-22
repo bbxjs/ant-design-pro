@@ -4,7 +4,6 @@
 
 ```
 $ git clone https://github.com/bbxjs/ant-design-pro.git
-$ git checkout bbx
 $ npm install
 $ npm start
 ```
@@ -23,7 +22,6 @@ $ npm start
 ## 功能
 
 - [x] v2 分支全部页面和功能
-- [ ] 主题切换功能
 
 
 https://github.com/ant-design/ant-design-pro/tree/v2 

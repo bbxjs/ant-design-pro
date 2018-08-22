@@ -24,9 +24,8 @@
   },
   "dependencies": {
     "@antv/data-set": "^0.9.0",
-    "@babel/polyfill": "^7.0.0-beta.36",
     "antd": "^3.8.2",
-    "bbx": "^1.1.3",
+    "bbx": "^1.1.4",
     "bizcharts": "^3.1.10",
     "bizcharts-plugin-slider": "^2.0.3",
     "classnames": "^2.2.6",
