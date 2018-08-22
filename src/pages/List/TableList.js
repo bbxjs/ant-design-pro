@@ -583,7 +583,6 @@ export default class TableList extends Component {
   }
 
   render() {
-    console.log(new Date * 1)
     const { data, fetchLoading, addLoading, removeLoading, updateLoading } = rule.state;
     const loading = fetchLoading || addLoading || removeLoading || updateLoading;
 
